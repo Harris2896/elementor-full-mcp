@@ -22,12 +22,85 @@ def build_server() -> Server:
                 description="Verify the configured WP_API_KEY works. Returns the WP user it maps to.",
                 inputSchema={"type": "object", "properties": {}, "additionalProperties": False},
             ),
+            Tool(
+                name="profile_list",
+                description="List all Kit profiles available on the configured site.",
+                inputSchema={"type": "object", "properties": {}, "additionalProperties": False},
+            ),
+            Tool(
+                name="profile_get",
+                description="Get one profile by ID.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"profile_id": {"type": "integer"}},
+                    "required": ["profile_id"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="profile_create",
+                description="Create a new profile. Body must conform to profile schema.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"profile": {"type": "object"}},
+                    "required": ["profile"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="profile_update",
+                description="Replace a profile (full body).",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "profile_id": {"type": "integer"},
+                        "profile":    {"type": "object"},
+                    },
+                    "required": ["profile_id", "profile"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="profile_delete",
+                description="Delete a profile by ID.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"profile_id": {"type": "integer"}},
+                    "required": ["profile_id"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="profile_apply",
+                description="Write the profile's colors/fonts/typography into the active Elementor Kit.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"profile_id": {"type": "integer"}},
+                    "required": ["profile_id"], "additionalProperties": False,
+                },
+            ),
         ]
 
     @server.call_tool()
     async def _call(name: str, arguments: dict) -> list[TextContent]:
+        from .tools.profile import (
+            profile_apply,
+            profile_create,
+            profile_delete,
+            profile_get,
+            profile_list,
+            profile_update,
+        )
         if name == "auth_verify":
             result = auth_verify(client)
+        elif name == "profile_list":
+            result = profile_list(client)
+        elif name == "profile_get":
+            result = profile_get(client, **arguments)
+        elif name == "profile_create":
+            result = profile_create(client, **arguments)
+        elif name == "profile_update":
+            result = profile_update(client, **arguments)
+        elif name == "profile_delete":
+            result = profile_delete(client, **arguments)
+        elif name == "profile_apply":
+            result = profile_apply(client, **arguments)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,
