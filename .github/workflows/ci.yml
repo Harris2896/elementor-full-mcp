@@ -38,19 +38,31 @@ jobs:
         with: { node-version: '20' }
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+      - name: Install plugin dependencies
+        working-directory: wp-plugin
+        run: composer install --no-interaction --no-progress
       - run: npm i -g @wordpress/env
       - run: wp-env start
-      - name: Activate plugins
+      - name: Activate bridge plugin
+        run: wp-env run cli wp plugin activate wp-plugin
+      - name: Activate Elementor (best effort)
+        continue-on-error: true
+        run: wp-env run cli wp plugin activate elementor
+      - name: Ensure pretty permalinks
         run: |
-          wp-env run cli wp plugin activate elementor-mcp-bridge
-          wp-env run cli wp plugin activate elementor
+          wp-env run cli wp rewrite structure '/%postname%/'
+          wp-env run cli wp rewrite flush
       - name: Mint API key
         id: keygen
         run: |
           KEY=$(wp-env run cli wp eval '
-            require_once ABSPATH . "wp-content/plugins/elementor-mcp-bridge/elementor-mcp-bridge.php";
+            require_once ABSPATH . "wp-content/plugins/wp-plugin/elementor-mcp-bridge.php";
             echo (new \ElementorMCP\Api_Keys())->generate(1, "ci", ["read","write"])["raw"];
-          ' | tr -d '\r\n')
+          ' | tr -d '\r\n ')
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
       - name: MCP integration
         working-directory: mcp-server

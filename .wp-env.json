@@ -1,6 +1,7 @@
 {
-  "core": "WordPress/WordPress#6.5",
+  "core": "WordPress/WordPress#6.6",
   "phpVersion": "8.1",
+  "testsEnvironment": false,
   "plugins": [
     "./wp-plugin",
     "https://downloads.wordpress.org/plugin/elementor.zip"
