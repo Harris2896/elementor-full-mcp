@@ -1,0 +1,36 @@
+<?php
+namespace ElementorMCP;
+
+defined('ABSPATH') || exit;
+
+class Plugin {
+    const VERSION = '0.0.1';
+
+    private static ?Plugin $instance = null;
+
+    public static function instance(): self {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function init(): void {
+        add_action('admin_menu', [$this, 'register_admin_menu']);
+        add_action('rest_api_init', [$this, 'register_rest_routes']);
+        add_filter('rest_authentication_errors', [$this, 'filter_rest_auth'], 99);
+    }
+
+    public function register_admin_menu(): void {
+        // Wired in P0.3
+    }
+
+    public function register_rest_routes(): void {
+        // Wired in P0.6
+    }
+
+    public function filter_rest_auth($result) {
+        // Wired in P0.5
+        return $result;
+    }
+}
