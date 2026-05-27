@@ -75,10 +75,53 @@ def build_server() -> Server:
                     "required": ["profile_id"], "additionalProperties": False,
                 },
             ),
+            Tool(
+                name="page_list",
+                description="List Elementor-enabled pages.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "search": {"type": "string"},
+                        "per_page": {"type": "integer"},
+                    },
+                    "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="page_create",
+                description="Create a new Elementor-enabled page.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "profile_id": {"type": "integer"},
+                    },
+                    "required": ["title"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="page_get",
+                description="Get one page by ID.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"page_id": {"type": "integer"}},
+                    "required": ["page_id"], "additionalProperties": False,
+                },
+            ),
+            Tool(
+                name="page_delete",
+                description="Delete a page by ID.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {"page_id": {"type": "integer"}},
+                    "required": ["page_id"], "additionalProperties": False,
+                },
+            ),
         ]
 
     @server.call_tool()
     async def _call(name: str, arguments: dict) -> list[TextContent]:
+        from .tools.page import page_create, page_delete, page_get, page_list
         from .tools.profile import (
             profile_apply,
             profile_create,
@@ -101,6 +144,14 @@ def build_server() -> Server:
             result = profile_delete(client, **arguments)
         elif name == "profile_apply":
             result = profile_apply(client, **arguments)
+        elif name == "page_list":
+            result = page_list(client, **arguments)
+        elif name == "page_create":
+            result = page_create(client, **arguments)
+        elif name == "page_get":
+            result = page_get(client, **arguments)
+        elif name == "page_delete":
+            result = page_delete(client, **arguments)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,
