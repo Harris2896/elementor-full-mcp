@@ -223,7 +223,7 @@ Namespace: `/wp-json/elementor-mcp/v1/`. All requests require `Authorization: Be
 - `GET /pages/{id}/backups` → list 5 snapshots.
 - `POST /pages/{id}/backups/{version}/restore` → revert.
 
-### 7.7 Library admin (proxies to MCP HTTP API)
+### 7.7 Library admin (proxies to MCP HTTP API — see §17.4)
 - `GET /library/stats`.
 - `POST /library/verify` → returns `{job_id}`.
 - `GET /library/jobs/{job_id}` — progress.
@@ -592,11 +592,17 @@ claude mcp add elementor -s user -- python -m elementor_mcp.server
 ```
 For Cursor / Codex, add the equivalent entry in their MCP config.
 
-### 17.4 Optional HTTP server (for admin UI library calls)
+### 17.4 HTTP server (required for library admin UI)
+The MCP server exposes two interfaces sharing the same `core/` business logic:
+- **stdio** (`python -m elementor_mcp.server`) — for MCP clients (agents).
+- **HTTP** (`python -m elementor_mcp.http_server --port 8765`) — required by the WP plugin's library admin UI (verify, import, stats, jobs).
+
 ```bash
 python -m elementor_mcp.http_server --port 8765
 ```
-Set `elementor_mcp_mcp_url=http://localhost:8765` in WP options (or the public URL if MCP runs on the VPS).
+Set `elementor_mcp_mcp_url` in WP options to the URL the plugin can reach. **Recommended deployment topology:** run the HTTP server on the same VPS as WordPress (`elementor.leobot.online`) bound to `127.0.0.1:8765`, and set the option to `http://127.0.0.1:8765`. Agents on developer machines use stdio independently and don't need the HTTP server.
+
+If a user runs only the stdio interface (agent-only, no admin UI library management), library import/verify must be done via the agent's MCP tools (`library.*`) instead of the WP admin UI.
 
 ### 17.5 `.env`
 ```
