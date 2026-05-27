@@ -1,0 +1,28 @@
+For the 'portfolio grid' sections with the numbers specified below,
+you can import them using the standard section import method as loop templates are not utilized.
+We created these numbered sections using the 'standard Elementor portfolio module' instead of loop template.
+
+L2211
+L2212
+L2213
+L2214
+L2215
+L2216
+L2217
+L2218
+L2219
+L2220
+
+How to import section?
+https://www.youtube.com/watch?v=GYLbhJhOfbo
+
+
+
+--------------------------
+
+
+
+For other portfolio grids, you should import them using the method demonstrated in the video below:
+
+How to import portfolio grid?
+https://www.youtube.com/watch?v=QQpyoi14V7E
