@@ -1,0 +1,9 @@
+.superpowers/
+.env
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+.vscode/
+.idea/
+node_modules/
