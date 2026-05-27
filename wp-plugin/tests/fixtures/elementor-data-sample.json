@@ -1,0 +1,29 @@
+[
+  {
+    "id": "44b1bea6",
+    "elType": "section",
+    "settings": {"_title": "Hero"},
+    "elements": [
+      {
+        "id": "21589f32",
+        "elType": "column",
+        "settings": {"_column_size": 100},
+        "elements": [
+          {"id": "5e524b85", "elType": "widget", "widgetType": "heading",
+           "settings": {"title": "Welcome"}, "elements": []}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "abc12345",
+    "elType": "section",
+    "settings": {},
+    "elements": [
+      {"id": "c1", "elType": "column", "settings": {}, "elements": [
+        {"id": "w1", "elType": "widget", "widgetType": "image",   "settings": {}, "elements": []},
+        {"id": "w2", "elType": "widget", "widgetType": "button",  "settings": {}, "elements": []}
+      ]}
+    ]
+  }
+]
