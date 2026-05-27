@@ -3,8 +3,7 @@
   "phpVersion": "8.1",
   "testsEnvironment": false,
   "plugins": [
-    "./wp-plugin",
-    "https://downloads.wordpress.org/plugin/elementor.zip"
+    "./wp-plugin"
   ],
   "config": {
     "WP_DEBUG": true,

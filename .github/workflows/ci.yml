@@ -49,9 +49,6 @@ jobs:
       - run: wp-env start
       - name: Activate bridge plugin
         run: wp-env run cli wp plugin activate wp-plugin
-      - name: Activate Elementor (best effort)
-        continue-on-error: true
-        run: wp-env run cli wp plugin activate elementor
       - name: Ensure pretty permalinks
         run: |
           wp-env run cli wp rewrite structure '/%postname%/'
