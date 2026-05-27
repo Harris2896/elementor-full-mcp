@@ -7,3 +7,10 @@ __pycache__/
 .vscode/
 .idea/
 node_modules/
+wp-plugin/vendor/
+wp-plugin/composer.lock
+mcp-server/.venv/
+mcp-server/uv.lock
+mcp-server/.env
+mcp-server/elementor_mcp/data/index.db
+.wp-env/
