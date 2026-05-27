@@ -16,6 +16,7 @@ class Plugin {
     }
 
     public function init(): void {
+        add_action('init', function () { (new Profile_CPT())->register(); });
         add_action('admin_menu', [$this, 'register_admin_menu']);
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_filter('rest_authentication_errors', [$this, 'filter_rest_auth'], 99);
