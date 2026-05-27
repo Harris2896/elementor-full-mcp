@@ -1,0 +1,30 @@
+{
+  "name": "SaaS-blue",
+  "colors": {
+    "primary":    "#0066FF",
+    "secondary":  "#00C2A8",
+    "text":       "#1A1A1A",
+    "accent":     "#FFD60A",
+    "background": "#FFFFFF",
+    "custom":     [{"name": "muted", "value": "#9F9F9F"}]
+  },
+  "fonts": {
+    "primary":   {"family": "Inter",   "source": "google", "weights": [400,500,700]},
+    "secondary": {"family": "Manrope", "source": "google", "weights": [400,700]}
+  },
+  "typography": {
+    "h1":   {"size": 64, "mobile": 36, "weight": 700, "line_height": 1.1},
+    "h2":   {"size": 48, "mobile": 28, "weight": 700, "line_height": 1.15},
+    "h3":   {"size": 32, "mobile": 22, "weight": 600, "line_height": 1.2},
+    "body": {"size": 17, "mobile": 15, "weight": 500, "line_height": 1.6},
+    "small":{"size": 14, "mobile": 12, "weight": 500, "line_height": 1.5}
+  },
+  "layout": {
+    "container_width":         1290,
+    "content_width":           1200,
+    "section_padding":         {"top": 80, "bottom": 80},
+    "section_padding_mobile":  {"top": 40, "bottom": 40}
+  },
+  "breakpoints": {"mobile": 767, "desktop": 1290},
+  "buttons":     {"border_radius": 0, "padding_x": 32, "padding_y": 16}
+}
