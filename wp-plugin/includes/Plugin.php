@@ -26,11 +26,12 @@ class Plugin {
     }
 
     public function register_rest_routes(): void {
-        // Wired in P0.6
+        (new Rest_Api())->register_routes();
     }
 
     public function filter_rest_auth($result) {
-        // Wired in P0.5
-        return $result;
+        static $auth = null;
+        if ($auth === null) $auth = new Auth(new Api_Keys());
+        return $auth->filter($result);
     }
 }
