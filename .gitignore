@@ -14,3 +14,5 @@ mcp-server/uv.lock
 mcp-server/.env
 mcp-server/elementor_mcp/data/index.db
 .wp-env/
+wp-plugin/.phpunit.result.cache
+.phpunit.result.cache
