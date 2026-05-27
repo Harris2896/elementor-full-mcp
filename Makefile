@@ -25,7 +25,7 @@ plugin-test:
 	cd wp-plugin && composer test
 
 wp-up:
-	npx wp-env start
+	npx @wordpress/env start
 
 wp-down:
-	npx wp-env stop
+	npx @wordpress/env stop

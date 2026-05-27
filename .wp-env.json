@@ -1,0 +1,17 @@
+{
+  "core": "WordPress/WordPress#6.5",
+  "phpVersion": "8.1",
+  "plugins": [
+    "./wp-plugin",
+    "https://downloads.wordpress.org/plugin/elementor.zip"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true
+  },
+  "mappings": {
+    "wp-content/uploads": "./.wp-env/uploads"
+  },
+  "port": 8888,
+  "testsPort": 8889
+}

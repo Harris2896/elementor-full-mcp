@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  mcp:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: mcp-server } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install uv
+      - run: uv venv && uv pip install -e ".[dev]"
+      - run: uv run ruff check .
+      - run: uv run pytest tests/unit -v
+
+  plugin:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: wp-plugin } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+      - run: composer install --no-interaction --no-progress
+      - run: composer test
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [mcp, plugin]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: npm i -g @wordpress/env
+      - run: wp-env start
+      - name: Activate plugins
+        run: |
+          wp-env run cli wp plugin activate elementor-mcp-bridge
+          wp-env run cli wp plugin activate elementor
+      - name: Mint API key
+        id: keygen
+        run: |
+          KEY=$(wp-env run cli wp eval '
+            require_once ABSPATH . "wp-content/plugins/elementor-mcp-bridge/elementor-mcp-bridge.php";
+            echo (new \ElementorMCP\Api_Keys())->generate(1, "ci", ["read","write"])["raw"];
+          ' | tr -d '\r\n')
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+      - name: MCP integration
+        working-directory: mcp-server
+        env:
+          EMCP_TEST_API_KEY: ${{ steps.keygen.outputs.key }}
+          EMCP_TEST_WP_URL: http://localhost:8888
+        run: |
+          pip install uv
+          uv venv && uv pip install -e ".[dev]"
+          uv run pytest tests/integration -v
