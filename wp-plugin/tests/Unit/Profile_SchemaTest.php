@@ -44,6 +44,22 @@ class Profile_SchemaTest extends TestCase {
         $this->assertContains("unknown field at top level: 'mystery_field'", $result['warnings']);
     }
 
+    public function test_non_array_colors_rejected() {
+        $data = $this->valid();
+        $data['colors'] = 'red';
+        $result = (new Profile_Schema())->validate($data);
+        $this->assertFalse($result['ok']);
+        $this->assertContains("colors must be an object", $result['errors']);
+    }
+
+    public function test_non_array_typography_level_rejected() {
+        $data = $this->valid();
+        $data['typography']['h1'] = 'huge';
+        $result = (new Profile_Schema())->validate($data);
+        $this->assertFalse($result['ok']);
+        $this->assertContains("typography.h1 must be an object", $result['errors']);
+    }
+
     private function valid(): array {
         return json_decode(file_get_contents(__DIR__ . '/../fixtures/profile-saas-blue.json'), true);
     }

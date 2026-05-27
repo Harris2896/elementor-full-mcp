@@ -25,27 +25,39 @@ class Profile_Schema {
             }
         }
 
-        if (isset($data['colors']) && is_array($data['colors'])) {
-            foreach (self::REQUIRED_COLORS as $name) {
-                if (!isset($data['colors'][$name])) {
-                    $errors[] = "missing required color: colors.{$name}";
-                    continue;
-                }
-                if (!$this->is_hex($data['colors'][$name])) {
-                    $errors[] = "invalid hex color for colors.{$name}: '{$data['colors'][$name]}'";
+        if (isset($data['colors'])) {
+            if (!is_array($data['colors'])) {
+                $errors[] = "colors must be an object";
+            } else {
+                foreach (self::REQUIRED_COLORS as $name) {
+                    if (!isset($data['colors'][$name])) {
+                        $errors[] = "missing required color: colors.{$name}";
+                        continue;
+                    }
+                    if (!$this->is_hex($data['colors'][$name])) {
+                        $errors[] = "invalid hex color for colors.{$name}: '{$data['colors'][$name]}'";
+                    }
                 }
             }
         }
 
-        if (isset($data['typography']) && is_array($data['typography'])) {
-            foreach (self::REQUIRED_TYPO_LEVELS as $lvl) {
-                if (!isset($data['typography'][$lvl])) {
-                    $errors[] = "missing typography level: typography.{$lvl}";
-                    continue;
-                }
-                $t = $data['typography'][$lvl];
-                if (!is_int($t['size'] ?? null) || $t['size'] <= 0) {
-                    $errors[] = "typography.{$lvl}.size must be > 0";
+        if (isset($data['typography'])) {
+            if (!is_array($data['typography'])) {
+                $errors[] = "typography must be an object";
+            } else {
+                foreach (self::REQUIRED_TYPO_LEVELS as $lvl) {
+                    if (!isset($data['typography'][$lvl])) {
+                        $errors[] = "missing typography level: typography.{$lvl}";
+                        continue;
+                    }
+                    $t = $data['typography'][$lvl];
+                    if (!is_array($t)) {
+                        $errors[] = "typography.{$lvl} must be an object";
+                        continue;
+                    }
+                    if (!is_int($t['size'] ?? null) || $t['size'] <= 0) {
+                        $errors[] = "typography.{$lvl}.size must be > 0";
+                    }
                 }
             }
         }
