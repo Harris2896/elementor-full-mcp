@@ -17,10 +17,16 @@ class Rest_Api {
             'callback'            => [$this, 'auth_verify'],
             'permission_callback' => fn() => get_current_user_id() > 0,
         ]);
+
+        (new Rest_Profiles(
+            new Profile_Repository(),
+            new Profile_Schema(),
+            new Kit_Writer(),
+        ))->register_routes();
     }
 
     public function health() {
-        return $this->envelope(true, [
+        return self::ok([
             'status'         => 'ok',
             'plugin_version' => Plugin::VERSION,
             'elementor'      => defined('ELEMENTOR_VERSION') ? ELEMENTOR_VERSION : null,
@@ -30,19 +36,25 @@ class Rest_Api {
     public function auth_verify() {
         $user = wp_get_current_user();
         $caps = array_keys(array_filter((array)($user->allcaps ?? [])));
-        return $this->envelope(true, [
+        return self::ok([
             'user_id' => (int) get_current_user_id(),
             'caps'    => $caps,
             'scopes'  => ['read', 'write'],
         ]);
     }
 
-    private function envelope(bool $ok, $data = null, array $warnings = [], ?array $error = null) {
+    public static function ok($data, array $warnings = []) {
         return rest_ensure_response([
-            'ok'       => $ok,
-            'data'     => $data,
-            'warnings' => $warnings,
-            'error'    => $error,
+            'ok' => true, 'data' => $data, 'warnings' => $warnings, 'error' => null,
         ]);
+    }
+
+    public static function fail(string $code, string $message, int $status = 400, array $details = []) {
+        $resp = rest_ensure_response([
+            'ok' => false, 'data' => null, 'warnings' => [],
+            'error' => ['code' => $code, 'message' => $message, 'details' => $details],
+        ]);
+        if (is_object($resp) && method_exists($resp, 'set_status')) $resp->set_status($status);
+        return $resp;
     }
 }
