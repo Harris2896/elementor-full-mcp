@@ -18,7 +18,7 @@ class Auth {
 
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         if (strpos($uri, '/wp-json/' . self::NS . '/') === false
-            && strpos($uri, '/index.php?rest_route=/' . self::NS . '/') === false) {
+            && strpos($uri, 'rest_route=/' . self::NS . '/') === false) {
             return null;
         }
 

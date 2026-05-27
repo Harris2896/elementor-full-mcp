@@ -19,7 +19,7 @@ class Rest_Api {
         ]);
     }
 
-    public function health(): array {
+    public function health() {
         return $this->envelope(true, [
             'status'         => 'ok',
             'plugin_version' => Plugin::VERSION,
@@ -27,7 +27,7 @@ class Rest_Api {
         ]);
     }
 
-    public function auth_verify(): array {
+    public function auth_verify() {
         $user = wp_get_current_user();
         $caps = array_keys(array_filter((array)($user->allcaps ?? [])));
         return $this->envelope(true, [
@@ -37,7 +37,7 @@ class Rest_Api {
         ]);
     }
 
-    private function envelope(bool $ok, $data = null, array $warnings = [], ?array $error = null): array {
+    private function envelope(bool $ok, $data = null, array $warnings = [], ?array $error = null) {
         return rest_ensure_response([
             'ok'       => $ok,
             'data'     => $data,
