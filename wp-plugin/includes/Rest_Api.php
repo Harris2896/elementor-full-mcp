@@ -23,6 +23,8 @@ class Rest_Api {
             new Profile_Schema(),
             new Kit_Writer(),
         ))->register_routes();
+
+        (new Rest_Pages())->register_routes();
     }
 
     public function health() {
