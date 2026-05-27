@@ -18,6 +18,8 @@ class Profile_RepositoryTest extends TestCase {
     protected function tearDown(): void { \Brain\Monkey\tearDown(); }
 
     public function test_create_inserts_post_and_meta() {
+        Functions\stubs(['is_wp_error' => fn($x) => $x instanceof \WP_Error]);
+        $data = ['name' => 'SaaS-blue', 'colors' => []];
         Functions\expect('wp_insert_post')->once()
             ->with(\Mockery::on(function ($args) {
                 return $args['post_type'] === 'emcp_profile'
@@ -26,8 +28,7 @@ class Profile_RepositoryTest extends TestCase {
             }))
             ->andReturn(101);
         Functions\expect('update_post_meta')->once()
-            ->with(101, '_emcp_profile_data', \Mockery::type('string'));
-        $data = ['name' => 'SaaS-blue', 'colors' => []];
+            ->with(101, '_emcp_profile_data', \Mockery::on(fn($s) => is_string($s) && json_decode($s, true) === $data));
         $id = (new Profile_Repository())->create($data);
         $this->assertSame(101, $id);
     }
@@ -49,15 +50,33 @@ class Profile_RepositoryTest extends TestCase {
     }
 
     public function test_update_replaces_postmeta() {
+        Functions\stubs(['is_wp_error' => fn($x) => $x instanceof \WP_Error]);
+        $data = ['name' => 'New', 'colors' => []];
         Functions\expect('get_post')->once()->with(8)
             ->andReturn((object)['ID' => 8, 'post_type' => 'emcp_profile']);
         Functions\expect('wp_update_post')->once()->with(\Mockery::on(function ($args) {
             return $args['ID'] === 8 && $args['post_title'] === 'New';
-        }));
+        }))->andReturn(8);
         Functions\expect('update_post_meta')->once()
-            ->with(8, '_emcp_profile_data', \Mockery::type('string'));
-        $ok = (new Profile_Repository())->update(8, ['name' => 'New', 'colors' => []]);
+            ->with(8, '_emcp_profile_data', \Mockery::on(fn($s) => is_string($s) && json_decode($s, true) === $data));
+        $ok = (new Profile_Repository())->update(8, $data);
         $this->assertTrue($ok);
+    }
+
+    public function test_create_throws_when_wp_insert_post_returns_wp_error() {
+        Functions\stubs(['is_wp_error' => fn($x) => $x instanceof \WP_Error]);
+        Functions\expect('wp_insert_post')->once()->andReturn(new \WP_Error('db_error', 'fail'));
+        $this->expectException(\RuntimeException::class);
+        (new \ElementorMCP\Profile_Repository())->create(['name' => 'X', 'colors' => []]);
+    }
+
+    public function test_update_returns_false_when_wp_update_post_errors() {
+        Functions\stubs(['is_wp_error' => fn($x) => $x instanceof \WP_Error]);
+        Functions\expect('get_post')->once()->with(8)
+            ->andReturn((object)['ID' => 8, 'post_type' => 'emcp_profile']);
+        Functions\expect('wp_update_post')->once()->andReturn(new \WP_Error('db_error', 'fail'));
+        Functions\expect('update_post_meta')->never();
+        $this->assertFalse((new \ElementorMCP\Profile_Repository())->update(8, ['name' => 'New']));
     }
 
     public function test_update_returns_false_for_wrong_post_type() {

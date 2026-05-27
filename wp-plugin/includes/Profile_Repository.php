@@ -12,6 +12,10 @@ class Profile_Repository {
             'post_title'  => sanitize_text_field($data['name'] ?? ''),
             'post_status' => 'publish',
         ]);
+        if (is_wp_error($id) || !$id) {
+            $msg = is_wp_error($id) ? $id->get_error_message() : 'wp_insert_post returned 0';
+            throw new \RuntimeException("Failed to create profile: {$msg}");
+        }
         update_post_meta((int) $id, self::META_KEY, wp_slash(wp_json_encode($data)));
         return (int) $id;
     }
@@ -31,10 +35,11 @@ class Profile_Repository {
     public function update(int $id, array $data): bool {
         $post = get_post($id);
         if (!$post || $post->post_type !== Profile_CPT::POST_TYPE) return false;
-        wp_update_post([
+        $result = wp_update_post([
             'ID'         => $id,
             'post_title' => sanitize_text_field($data['name'] ?? $post->post_title),
         ]);
+        if (is_wp_error($result) || !$result) return false;
         update_post_meta($id, self::META_KEY, wp_slash(wp_json_encode($data)));
         return true;
     }
