@@ -22,7 +22,7 @@ class Plugin {
     }
 
     public function register_admin_menu(): void {
-        // Wired in P0.3
+        (new Admin())->register_menu();
     }
 
     public function register_rest_routes(): void {
