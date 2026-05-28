@@ -33,6 +33,45 @@ class WpClient:
     def delete(self, path: str) -> ToolResult:
         return self._request("DELETE", path)
 
+    def post_binary(
+        self,
+        path: str,
+        *,
+        content: bytes,
+        filename: str,
+        content_type: str,
+        wp_native: bool = False,
+    ) -> ToolResult:
+        """POST raw binary content (e.g. an image to /wp/v2/media)."""
+        url = f"{self.base}/wp-json/wp/v2{path}" if wp_native else self._url(path)
+        try:
+            resp = self._http.request(
+                "POST",
+                url,
+                content=content,
+                headers={
+                    "Content-Type": content_type,
+                    "Content-Disposition": f'attachment; filename="{filename}"',
+                },
+            )
+        except httpx.ConnectError as e:
+            return fail(ErrorCode.E_WP_UNREACHABLE, f"Cannot reach WP at {url}: {e}")
+        except httpx.HTTPError as e:
+            return fail(ErrorCode.E_INTERNAL, f"HTTP error: {e}")
+
+        if resp.status_code == 401:
+            return fail(ErrorCode.E_WP_AUTH, "WP rejected API key")
+        if resp.status_code >= 500:
+            return fail(ErrorCode.E_INTERNAL, f"WP returned {resp.status_code}")
+        try:
+            body = resp.json()
+        except ValueError:
+            return fail(ErrorCode.E_INTERNAL, "Non-JSON response from WP")
+
+        if resp.status_code >= 400:
+            return fail(ErrorCode.E_INTERNAL, f"WP error {resp.status_code}: {body}")
+        return ok(body)
+
     def _request(self, method: str, path: str, **kw: Any) -> ToolResult:
         url = self._url(path)
         try:
