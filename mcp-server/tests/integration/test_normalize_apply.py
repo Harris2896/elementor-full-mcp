@@ -7,7 +7,6 @@ from elementor_mcp.tools.page import page_create, page_delete
 from elementor_mcp.tools.profile import profile_apply, profile_create, profile_delete
 from elementor_mcp.tools.section import section_add, section_get
 
-
 FIX = Path(__file__).parent.parent / "fixtures"
 
 

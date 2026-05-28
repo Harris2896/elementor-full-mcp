@@ -27,16 +27,29 @@ cp mcp-server/.env.example mcp-server/.env
 claude mcp add elementor -s user -- python -m elementor_mcp.server
 
 # Verify integration:
-make plugin-test    # 77 PHPUnit tests
-make mcp-test       # 33 pytest tests
+make plugin-test    # 85 PHPUnit tests
+make mcp-test       # 115 pytest tests
 EMCP_TEST_API_KEY="$KEY" EMCP_TEST_WP_URL=http://localhost:8888 \
   cd mcp-server && uv run pytest tests/integration -v
 ```
 
-## MCP tools (after Phase 1a)
+## Building the template index
+
+After cloning, build the local SQLite index from the section-express library:
+
+```bash
+cd mcp-server && uv run python -m elementor_mcp.scripts.build_index \
+  --src "../section-express-libr/pack/JSON Files"
+```
+
+This creates `mcp-server/elementor_mcp/data/index.db` with one row per template (~2,870 templates indexed; gitignored).
+
+## MCP tools (after Phase 1b-2)
 
 - **Auth:** `auth_verify`
 - **Profiles:** `profile_list`, `profile_get`, `profile_create`, `profile_update`, `profile_delete`, `profile_apply`
 - **Pages:** `page_list`, `page_create`, `page_get`, `page_delete`
-- **Sections:** `section_list`, `section_get`, `section_add`, `section_update`, `section_delete`, `section_duplicate`, `section_reorder`, `section_history`, `section_restore`
+- **Sections:** `section_list`, `section_get`, `section_add` (with profile-aware normalization), `section_update`, `section_delete`, `section_duplicate`, `section_reorder`, `section_history`, `section_restore`
 - **Kit (raw):** `kit_get`, `kit_set`
+- **Images:** `image_generate`, `image_upload`, `image_describe_slot`
+- **Templates:** `template_search`, `template_get`, `template_preview`, `template_list_categories`
