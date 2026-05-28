@@ -84,6 +84,8 @@ jobs:
         env:
           EMCP_TEST_API_KEY: ${{ steps.keygen.outputs.key }}
           EMCP_TEST_WP_URL: http://localhost:8888
+          EMCP_TEST_OPENAI_KEY: ${{ secrets.EMCP_TEST_OPENAI_KEY }}
+          EMCP_TEST_UNSPLASH_KEY: ${{ secrets.EMCP_TEST_UNSPLASH_KEY }}
         run: |
           pip install uv
           uv venv && uv pip install -e ".[dev]"
