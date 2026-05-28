@@ -163,10 +163,31 @@ def build_server() -> Server:
                  inputSchema={"type":"object","properties":{
                      "settings":{"type":"object"},
                  },"required":["settings"],"additionalProperties":False}),
+            Tool(name="image_generate",
+                 description="Generate an image at exact dimensions via OpenAI gpt-image-1 (or Unsplash fallback). Returns base64-encoded PNG bytes.",
+                 inputSchema={"type":"object","properties":{
+                     "prompt":{"type":"string"},
+                     "width":{"type":"integer"},
+                     "height":{"type":"integer"},
+                     "prefer":{"type":"string","enum":["openai","unsplash"]},
+                 },"required":["prompt","width","height"],"additionalProperties":False}),
+            Tool(name="image_upload",
+                 description="Upload a base64-encoded image to the WP Media Library. Returns the WP attachment id + source_url.",
+                 inputSchema={"type":"object","properties":{
+                     "content_b64":{"type":"string"},
+                     "filename":{"type":"string"},
+                     "mime":{"type":"string"},
+                 },"required":["content_b64","filename"],"additionalProperties":False}),
+            Tool(name="image_describe_slot",
+                 description="List image-bearing slots in a section JSON (widget_image + section_background).",
+                 inputSchema={"type":"object","properties":{
+                     "section_json":{"type":"object"},
+                 },"required":["section_json"],"additionalProperties":False}),
         ]
 
     @server.call_tool()
     async def _call(name: str, arguments: dict) -> list[TextContent]:
+        from .tools.image import image_describe_slot, image_generate, image_upload
         from .tools.kit import kit_get, kit_set
         from .tools.page import page_create, page_delete, page_get, page_list
         from .tools.profile import (
@@ -232,6 +253,12 @@ def build_server() -> Server:
             result = kit_get(client)
         elif name == "kit_set":
             result = kit_set(client, **arguments)
+        elif name == "image_generate":
+            result = image_generate(settings=settings, **arguments)
+        elif name == "image_upload":
+            result = image_upload(client=client, **arguments)
+        elif name == "image_describe_slot":
+            result = image_describe_slot(**arguments)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,
