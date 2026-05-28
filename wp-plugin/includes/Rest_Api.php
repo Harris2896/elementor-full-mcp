@@ -32,6 +32,8 @@ class Rest_Api {
             new Cache_Invalidator(),
             new Page_Lock(),
         ))->register_routes();
+
+        (new Rest_Backups(new Backup_Store(), new Cache_Invalidator(), new Page_Lock()))->register_routes();
     }
 
     public function health() {
