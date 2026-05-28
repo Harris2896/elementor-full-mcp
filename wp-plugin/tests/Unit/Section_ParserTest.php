@@ -82,4 +82,29 @@ class Section_ParserTest extends TestCase {
         $this->expectException(\InvalidArgumentException::class);
         (new Section_Parser())->reorder($this->sample(), ['44b1bea6']);  // missing one
     }
+
+    public function test_replace_preserves_existing_eltype_when_input_missing() {
+        $data = $this->sample();
+        $patch = ['id' => '44b1bea6', 'settings' => ['_title' => 'New'], 'elements' => []];
+        $result = (new Section_Parser())->replace($data, '44b1bea6', $patch);
+        $this->assertSame('section', $result[0]['elType']);
+        $this->assertSame('New', $result[0]['settings']['_title']);
+    }
+
+    public function test_list_includes_container_eltype() {
+        $data = json_decode(file_get_contents(__DIR__ . '/../fixtures/elementor-data-container-mix.json'), true);
+        $list = (new Section_Parser())->list($data);
+        $this->assertSame('section',   $list[0]['el_type']);
+        $this->assertSame('container', $list[1]['el_type']);
+        $this->assertSame('section',   $list[2]['el_type']);
+    }
+
+    public function test_prune_orphans_removes_duplicate_titles_with_different_eltypes() {
+        $data = json_decode(file_get_contents(__DIR__ . '/../fixtures/elementor-data-container-mix.json'), true);
+        $result = (new Section_Parser())->prune_orphans($data);
+        // The container with the same _title='Hero' as the section should be removed.
+        $this->assertCount(2, $result);
+        $this->assertSame('44b1bea6', $result[0]['id']);
+        $this->assertSame('feedface', $result[1]['id']);
+    }
 }

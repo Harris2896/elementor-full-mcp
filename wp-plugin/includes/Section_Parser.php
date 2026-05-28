@@ -38,6 +38,11 @@ class Section_Parser {
     public function replace(array $data, string $sid, array $section): array {
         foreach ($data as $i => $existing) {
             if (($existing['id'] ?? '') === $sid) {
+                // Preserve existing elType if the patch doesn't specify one,
+                // so Elementor migration doesn't silently demote a 'section' to 'container'.
+                if (!isset($section['elType']) && isset($existing['elType'])) {
+                    $section['elType'] = $existing['elType'];
+                }
                 $data[$i] = $section;
                 return $data;
             }
@@ -86,5 +91,29 @@ class Section_Parser {
             $node['elements'] = array_map(fn($c) => $this->rekey_ids($c), $node['elements']);
         }
         return $node;
+    }
+
+    /**
+     * Remove top-level entries that share a `settings._title` with an
+     * earlier entry but use a different elType. Used to recover from
+     * Elementor migration cycles that emit ghost containers.
+     */
+    public function prune_orphans(array $data): array {
+        $seen_titles = [];
+        $out = [];
+        foreach ($data as $section) {
+            $title = $section['settings']['_title'] ?? null;
+            if ($title !== null && isset($seen_titles[$title])) {
+                $first_eltype = $seen_titles[$title];
+                if (($section['elType'] ?? '') !== $first_eltype) {
+                    continue;  // drop the ghost
+                }
+            }
+            if ($title !== null) {
+                $seen_titles[$title] = $section['elType'] ?? '';
+            }
+            $out[] = $section;
+        }
+        return $out;
     }
 }

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "44b1bea6",
+    "elType": "section",
+    "settings": {"_title": "Hero"},
+    "elements": []
+  },
+  {
+    "id": "75832b3",
+    "elType": "container",
+    "settings": {"_title": "Hero"},
+    "elements": []
+  },
+  {
+    "id": "feedface",
+    "elType": "section",
+    "settings": {"_title": "Footer"},
+    "elements": []
+  }
+]

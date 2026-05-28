@@ -124,6 +124,8 @@ class Rest_Sections {
             $result = $apply($page['data'], $req);
             if (isset($result['fail'])) return $result['fail'];
 
+            $result['data'] = $this->parser->prune_orphans($result['data']);
+
             $this->backups->snapshot($page_id, $page['data']);
             update_post_meta($page_id, '_elementor_data', wp_slash(wp_json_encode($result['data'])));
             $this->cache->clear_for_page($page_id);
