@@ -1,0 +1,29 @@
+{
+  "content": [{
+    "id": "abc12345",
+    "elType": "section",
+    "settings": {"_title": "Hero", "background_background": "classic", "background_color": "#000000"},
+    "elements": [{
+      "id": "col10001",
+      "elType": "column",
+      "settings": {"_column_size": 100},
+      "elements": [{
+        "id": "wid10001",
+        "elType": "widget",
+        "widgetType": "heading",
+        "settings": {"title": "Welcome", "typography_font_family": "Inter", "title_color": "#FFFFFF"},
+        "elements": []
+      }, {
+        "id": "wid10002",
+        "elType": "widget",
+        "widgetType": "button",
+        "settings": {"text": "Shop", "background_color": "#FF0000"},
+        "elements": []
+      }]
+    }]
+  }],
+  "page_settings": {},
+  "version": "0.4",
+  "title": "Hero Simple",
+  "type": "section"
+}
