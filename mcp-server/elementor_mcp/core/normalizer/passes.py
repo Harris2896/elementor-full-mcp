@@ -82,3 +82,84 @@ def pass1_colors(section: dict, profile: dict) -> tuple[dict, dict]:
 
     visit(out)
     return out, diff
+
+
+def pass2_fonts(section: dict, profile: dict) -> tuple[dict, dict]:
+    out = copy.deepcopy(section)
+    fonts = profile.get("fonts") or {}
+    primary = (fonts.get("primary") or {}).get("family") or ""
+    secondary = (fonts.get("secondary") or {}).get("family") or ""
+    diff = {"fonts_remapped": [], "fonts_warned": []}
+
+    def visit_settings(settings: dict) -> None:
+        if not isinstance(settings, dict):
+            return
+        fam = settings.get("typography_font_family")
+        if not isinstance(fam, str) or not fam:
+            return
+        slot = None
+        if fam == primary:
+            slot = "primary"
+        elif fam == secondary:
+            slot = "secondary"
+        if slot:
+            globals_dict = settings.setdefault("__globals__", {})
+            globals_dict["typography_typography"] = f"globals/typography?id={slot}"
+            del settings["typography_font_family"]
+            diff["fonts_remapped"].append({"from": fam, "to": slot})
+        else:
+            diff["fonts_warned"].append({"from": fam, "nearest": None})
+
+    def visit(node: dict) -> None:
+        visit_settings(node.get("settings"))
+        for child in node.get("elements", []) or []:
+            visit(child)
+
+    visit(out)
+    return out, diff
+
+
+def _classify_size_px(px: float) -> str:
+    if px >= 56:
+        return "h1"
+    if px >= 40:
+        return "h2"
+    if px >= 28:
+        return "h3"
+    if px >= 17:
+        return "body"
+    return "small"
+
+
+def pass3_typography_sizes(section: dict, profile: dict) -> tuple[dict, dict]:
+    out = copy.deepcopy(section)
+    diff = {"sizes_snapped": []}
+
+    def visit_settings(settings: dict) -> None:
+        if not isinstance(settings, dict):
+            return
+        fs = settings.get("typography_font_size")
+        if not isinstance(fs, dict):
+            return
+        if fs.get("unit") != "px":
+            return
+        try:
+            size_px = float(fs.get("size") or 0)
+        except (TypeError, ValueError):
+            return
+        if size_px <= 0:
+            return
+        level = _classify_size_px(size_px)
+        globals_dict = settings.setdefault("__globals__", {})
+        globals_dict["typography_typography"] = f"globals/typography?id={level}"
+        diff["sizes_snapped"].append({"px": size_px, "to_level": level})
+        for k in ("typography_font_size", "typography_font_weight", "typography_line_height"):
+            settings.pop(k, None)
+
+    def visit(node: dict) -> None:
+        visit_settings(node.get("settings"))
+        for child in node.get("elements", []) or []:
+            visit(child)
+
+    visit(out)
+    return out, diff
