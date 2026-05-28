@@ -1,0 +1,21 @@
+{
+  "content": [{
+    "id": "feat0001",
+    "elType": "section",
+    "settings": {"structure": "33"},
+    "elements": [
+      {"id": "col0001", "elType": "column", "settings": {"_column_size": 33}, "elements": [
+        {"id": "ico0001", "elType": "widget", "widgetType": "icon-box", "settings": {"title_text": "Fast", "icon_primary_color": "#FF0000"}, "elements": []}
+      ]},
+      {"id": "col0002", "elType": "column", "settings": {"_column_size": 33}, "elements": [
+        {"id": "ico0002", "elType": "widget", "widgetType": "icon-box", "settings": {"title_text": "Secure", "icon_primary_color": "#00FF00"}, "elements": []}
+      ]},
+      {"id": "col0003", "elType": "column", "settings": {"_column_size": 33}, "elements": [
+        {"id": "ico0003", "elType": "widget", "widgetType": "icon-box", "settings": {"title_text": "Cheap", "icon_primary_color": "#0000FF"}, "elements": []}
+      ]}
+    ]
+  }],
+  "version": "0.4",
+  "title": "3-col features",
+  "type": "section"
+}

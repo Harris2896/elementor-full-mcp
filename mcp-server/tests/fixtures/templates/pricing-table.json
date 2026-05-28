@@ -1,0 +1,13 @@
+{
+  "content": [{
+    "id": "pric0001",
+    "elType": "section",
+    "settings": {},
+    "elements": [{"id": "pcol001", "elType": "column", "settings": {"_column_size": 100}, "elements": [
+      {"id": "ptbl001", "elType": "widget", "widgetType": "price-table", "settings": {"heading": "Pro Plan", "currency_symbol": "$", "price": "29", "typography_font_family": "Manrope"}, "elements": []}
+    ]}]
+  }],
+  "version": "0.4",
+  "title": "Pricing",
+  "type": "section"
+}

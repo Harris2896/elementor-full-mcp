@@ -1,0 +1,13 @@
+{
+  "content": [{
+    "id": "test0001",
+    "elType": "section",
+    "settings": {},
+    "elements": [{"id": "tcol001", "elType": "column", "settings": {"_column_size": 100}, "elements": [
+      {"id": "tquote1", "elType": "widget", "widgetType": "testimonial", "settings": {"content": "It works great!", "name": "Jane Doe", "title_color": "#222222"}, "elements": []}
+    ]}]
+  }],
+  "version": "0.4",
+  "title": "Testimonial",
+  "type": "section"
+}
