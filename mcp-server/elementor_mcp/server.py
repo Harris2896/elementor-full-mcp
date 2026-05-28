@@ -157,10 +157,17 @@ def build_server() -> Server:
                  inputSchema={"type":"object","properties":{
                      "page_id":{"type":"integer"},"version":{"type":"integer"},
                  },"required":["page_id","version"],"additionalProperties":False}),
+            Tool(name="kit_get", description="Read the current Elementor Kit settings.",
+                 inputSchema={"type":"object","properties":{},"additionalProperties":False}),
+            Tool(name="kit_set", description="Replace the Elementor Kit settings (raw, advanced).",
+                 inputSchema={"type":"object","properties":{
+                     "settings":{"type":"object"},
+                 },"required":["settings"],"additionalProperties":False}),
         ]
 
     @server.call_tool()
     async def _call(name: str, arguments: dict) -> list[TextContent]:
+        from .tools.kit import kit_get, kit_set
         from .tools.page import page_create, page_delete, page_get, page_list
         from .tools.profile import (
             profile_apply,
@@ -221,6 +228,10 @@ def build_server() -> Server:
             result = section_history(client, **arguments)
         elif name == "section_restore":
             result = section_restore(client, **arguments)
+        elif name == "kit_get":
+            result = kit_get(client)
+        elif name == "kit_set":
+            result = kit_set(client, **arguments)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,
