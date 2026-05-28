@@ -125,11 +125,13 @@ def build_server() -> Server:
                  inputSchema={"type":"object","properties":{
                      "page_id":{"type":"integer"},"sid":{"type":"string"},
                  },"required":["page_id","sid"],"additionalProperties":False}),
-            Tool(name="section_add", description="Append or insert a new section.",
+            Tool(name="section_add", description="Append or insert a new section. When profile_id is set, the section JSON is normalized to the profile (colors → globals, fonts → globals, sizes → typography) and any overflow colors are promoted to Kit custom_colors. A diff report is included in the response.",
                  inputSchema={"type":"object","properties":{
                      "page_id":{"type":"integer"},
                      "section_json":{"type":"object"},
                      "position":{"type":"integer"},
+                     "profile_id":{"type":"integer"},
+                     "normalize":{"type":"boolean"},
                  },"required":["page_id","section_json"],"additionalProperties":False}),
             Tool(name="section_update", description="Replace a section by id.",
                  inputSchema={"type":"object","properties":{
