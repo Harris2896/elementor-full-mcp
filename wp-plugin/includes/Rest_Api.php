@@ -25,6 +25,13 @@ class Rest_Api {
         ))->register_routes();
 
         (new Rest_Pages())->register_routes();
+
+        (new Rest_Sections(
+            new Section_Parser(),
+            new Backup_Store(),
+            new Cache_Invalidator(),
+            new Page_Lock(),
+        ))->register_routes();
     }
 
     public function health() {
