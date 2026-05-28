@@ -14,6 +14,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 register_activation_hook(__FILE__, function () {
     update_option('elementor_mcp_version', \ElementorMCP\Plugin::VERSION);
+    (new \ElementorMCP\Theme_Bootstrap())->ensure();
 });
 
 register_deactivation_hook(__FILE__, function () {
