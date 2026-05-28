@@ -4,13 +4,20 @@ import pytest
 
 from elementor_mcp.core.wp_client import WpClient
 from elementor_mcp.tools.kit import kit_get
-from elementor_mcp.tools.page import page_create, page_delete, page_get
+from elementor_mcp.tools.page import page_create, page_delete
 from elementor_mcp.tools.profile import (
-    profile_apply, profile_create, profile_delete, profile_get, profile_list,
+    profile_apply,
+    profile_create,
+    profile_delete,
+    profile_get,
 )
 from elementor_mcp.tools.section import (
-    section_add, section_delete, section_get, section_history,
-    section_list, section_reorder, section_restore,
+    section_add,
+    section_delete,
+    section_history,
+    section_list,
+    section_reorder,
+    section_restore,
 )
 
 
