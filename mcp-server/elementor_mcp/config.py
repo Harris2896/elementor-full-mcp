@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     wp_api_key: str
     log_level: str = "info"
     http_timeout: int = 15
+    openai_api_key: str = ""
+    unsplash_access_key: str = ""
 
 
 def load() -> Settings:
