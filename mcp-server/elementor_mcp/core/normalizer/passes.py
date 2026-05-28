@@ -221,3 +221,30 @@ def pass5_buttons(section: dict, profile: dict) -> tuple[dict, dict]:
 
     visit(out)
     return out, diff
+
+
+def strip_tablet(section: dict) -> dict:
+    """Remove any *_tablet settings key (profile is desktop + mobile only)."""
+    out = copy.deepcopy(section)
+
+    def visit_settings(settings: dict) -> int:
+        if not isinstance(settings, dict):
+            return 0
+        removed = 0
+        for k in list(settings.keys()):
+            if k.endswith("_tablet"):
+                del settings[k]
+                removed += 1
+        return removed
+
+    count = 0
+
+    def visit(node: dict) -> None:
+        nonlocal count
+        count += visit_settings(node.get("settings"))
+        for child in node.get("elements", []) or []:
+            visit(child)
+
+    visit(out)
+    out["_tablet_stripped"] = count  # transient counter for orchestrator
+    return out
