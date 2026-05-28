@@ -183,12 +183,43 @@ def build_server() -> Server:
                  inputSchema={"type":"object","properties":{
                      "section_json":{"type":"object"},
                  },"required":["section_json"],"additionalProperties":False}),
+            Tool(name="template_search",
+                 description="Search the template library by query + filters. Returns top-k template metadata rows.",
+                 inputSchema={"type":"object","properties":{
+                     "query":{"type":"string"},
+                     "category":{"type":"string"},
+                     "has_image":{"type":"boolean"},
+                     "k":{"type":"integer"},
+                 },"additionalProperties":False}),
+            Tool(name="template_get",
+                 description="Get a template's full JSON + indexed metadata by id.",
+                 inputSchema={"type":"object","properties":{
+                     "template_id":{"type":"string"},
+                 },"required":["template_id"],"additionalProperties":False}),
+            Tool(name="template_preview",
+                 description="Get a template's preview URL (may be null in Stage B).",
+                 inputSchema={"type":"object","properties":{
+                     "template_id":{"type":"string"},
+                 },"required":["template_id"],"additionalProperties":False}),
+            Tool(name="template_list_categories",
+                 description="List all distinct template categories with counts.",
+                 inputSchema={"type":"object","properties":{},"additionalProperties":False}),
         ]
 
     @server.call_tool()
     async def _call(name: str, arguments: dict) -> list[TextContent]:
+        from pathlib import Path as _Path
+
         from .tools.image import image_describe_slot, image_generate, image_upload
         from .tools.kit import kit_get, kit_set
+        from .tools.template import (
+            template_get,
+            template_list_categories,
+            template_preview,
+            template_search,
+        )
+        _DB_PATH = _Path(__file__).resolve().parent / "data" / "index.db"
+        _SRC_DIR = _Path(__file__).resolve().parent.parent.parent / "section-express-libr" / "pack" / "JSON Files"
         from .tools.page import page_create, page_delete, page_get, page_list
         from .tools.profile import (
             profile_apply,
@@ -259,6 +290,14 @@ def build_server() -> Server:
             result = image_upload(client=client, **arguments)
         elif name == "image_describe_slot":
             result = image_describe_slot(**arguments)
+        elif name == "template_search":
+            result = template_search(db_path=_DB_PATH, src_dir=_SRC_DIR, **arguments)
+        elif name == "template_get":
+            result = template_get(db_path=_DB_PATH, src_dir=_SRC_DIR, **arguments)
+        elif name == "template_preview":
+            result = template_preview(db_path=_DB_PATH, **arguments)
+        elif name == "template_list_categories":
+            result = template_list_categories(db_path=_DB_PATH)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,

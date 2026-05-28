@@ -40,3 +40,20 @@ CREATE VIRTUAL TABLE IF NOT EXISTS templates_fts USING fts5(
     industries,
     content='templates'
 );
+
+CREATE TRIGGER IF NOT EXISTS templates_ai AFTER INSERT ON templates BEGIN
+    INSERT INTO templates_fts(rowid, id, description, use_cases, style_tags, industries)
+    VALUES (new.rowid, new.id, new.description, new.use_cases, new.style_tags, new.industries);
+END;
+
+CREATE TRIGGER IF NOT EXISTS templates_ad AFTER DELETE ON templates BEGIN
+    INSERT INTO templates_fts(templates_fts, rowid, id, description, use_cases, style_tags, industries)
+    VALUES ('delete', old.rowid, old.id, old.description, old.use_cases, old.style_tags, old.industries);
+END;
+
+CREATE TRIGGER IF NOT EXISTS templates_au AFTER UPDATE ON templates BEGIN
+    INSERT INTO templates_fts(templates_fts, rowid, id, description, use_cases, style_tags, industries)
+    VALUES ('delete', old.rowid, old.id, old.description, old.use_cases, old.style_tags, old.industries);
+    INSERT INTO templates_fts(rowid, id, description, use_cases, style_tags, industries)
+    VALUES (new.rowid, new.id, new.description, new.use_cases, new.style_tags, new.industries);
+END;
