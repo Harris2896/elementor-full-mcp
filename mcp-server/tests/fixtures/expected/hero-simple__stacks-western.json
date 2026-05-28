@@ -1,0 +1,100 @@
+{
+  "diff": {
+    "buttons_styled": [
+      {
+        "widget_id": "wid10002"
+      }
+    ],
+    "colors_overflow": [
+      {
+        "hex": "#FF0000",
+        "key": "background_color"
+      }
+    ],
+    "colors_remapped": [],
+    "colors_warned": [
+      {
+        "delta_e": 13.55,
+        "from": "#000000",
+        "key": "background_color",
+        "nearest": "text"
+      },
+      {
+        "delta_e": 5.92,
+        "from": "#FFFFFF",
+        "key": "title_color",
+        "nearest": "background"
+      }
+    ],
+    "content_width_snapped": [],
+    "fonts_remapped": [
+      {
+        "from": "Inter",
+        "to": "secondary"
+      }
+    ],
+    "fonts_warned": [],
+    "padding_snapped": [],
+    "sizes_snapped": [],
+    "tablet_stripped": 0
+  },
+  "section": {
+    "elType": "section",
+    "elements": [
+      {
+        "elType": "column",
+        "elements": [
+          {
+            "elType": "widget",
+            "elements": [],
+            "id": "wid10001",
+            "settings": {
+              "__globals__": {
+                "typography_typography": "globals/typography?id=secondary"
+              },
+              "title": "Welcome",
+              "title_color": "#FFFFFF"
+            },
+            "widgetType": "heading"
+          },
+          {
+            "elType": "widget",
+            "elements": [],
+            "id": "wid10002",
+            "settings": {
+              "background_color": "#FF0000",
+              "border_radius": {
+                "bottom": 2,
+                "isLinked": true,
+                "left": 2,
+                "right": 2,
+                "top": 2,
+                "unit": "px"
+              },
+              "text": "Shop",
+              "text_padding": {
+                "bottom": 18,
+                "isLinked": false,
+                "left": 36,
+                "right": 36,
+                "top": 18,
+                "unit": "px"
+              }
+            },
+            "widgetType": "button"
+          }
+        ],
+        "id": "col10001",
+        "settings": {
+          "_column_size": 100
+        }
+      }
+    ],
+    "id": "abc12345",
+    "settings": {
+      "_title": "Hero",
+      "background_background": "classic",
+      "background_color": "#000000"
+    }
+  }
+}
