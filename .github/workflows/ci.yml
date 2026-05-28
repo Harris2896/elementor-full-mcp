@@ -49,6 +49,21 @@ jobs:
       - run: wp-env start
       - name: Activate bridge plugin
         run: wp-env run cli wp plugin activate wp-plugin
+      - name: Install + activate Elementor (pinned for WP 6.5 compat)
+        run: |
+          wp-env run cli wp plugin install elementor --version=3.21.0 --activate || true
+        continue-on-error: true
+      - name: Ensure Elementor active kit exists
+        run: |
+          KIT=$(wp-env run cli wp option get elementor_active_kit 2>/dev/null | tr -d '\r\n ')
+          if [ -z "$KIT" ] || [ "$KIT" = "0" ]; then
+            NEW_KIT=$(wp-env run cli wp post create --post_type=elementor_library --post_title='CI Kit' --post_status=publish --porcelain | tr -d '\r\n ')
+            wp-env run cli wp option update elementor_active_kit $NEW_KIT
+            echo "Created kit $NEW_KIT"
+          else
+            echo "Active kit already exists: $KIT"
+          fi
+        continue-on-error: true
       - name: Ensure pretty permalinks
         run: |
           wp-env run cli wp rewrite structure '/%postname%/'
