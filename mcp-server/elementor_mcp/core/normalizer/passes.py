@@ -163,3 +163,61 @@ def pass3_typography_sizes(section: dict, profile: dict) -> tuple[dict, dict]:
 
     visit(out)
     return out, diff
+
+
+def _to_int(v) -> int | None:
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return None
+
+
+def pass4_layout(section: dict, profile: dict) -> tuple[dict, dict]:
+    out = copy.deepcopy(section)
+    layout = profile.get("layout") or {}
+    diff: dict = {"padding_snapped": [], "content_width_snapped": []}
+
+    target_top = (layout.get("section_padding") or {}).get("top", 80)
+    target_bot = (layout.get("section_padding") or {}).get("bottom", 80)
+    target_cw  = layout.get("content_width", 1200)
+
+    settings = out.get("settings") or {}
+    pad = settings.get("padding") if isinstance(settings.get("padding"), dict) else None
+    if pad and pad.get("unit") == "px":
+        t = _to_int(pad.get("top"))
+        b = _to_int(pad.get("bottom"))
+        if t is not None and abs(t - target_top) <= 20:
+            diff["padding_snapped"].append({"delta_top": t - target_top, "snapped": True})
+            pad["top"] = target_top
+        if b is not None and abs(b - target_bot) <= 20:
+            pad["bottom"] = target_bot
+
+    cw = settings.get("content_width") if isinstance(settings.get("content_width"), dict) else None
+    if cw and cw.get("unit") == "px":
+        size = _to_int(cw.get("size"))
+        if size is not None and abs(size - target_cw) <= 100:
+            diff["content_width_snapped"].append({"from": size, "to": target_cw})
+            cw["size"] = target_cw
+
+    return out, diff
+
+
+def pass5_buttons(section: dict, profile: dict) -> tuple[dict, dict]:
+    out = copy.deepcopy(section)
+    btn = profile.get("buttons") or {}
+    r = btn.get("border_radius", 0)
+    px = btn.get("padding_x", 32)
+    py = btn.get("padding_y", 16)
+    diff: dict = {"buttons_styled": []}
+
+    def visit(node: dict) -> None:
+        if node.get("elType") == "widget" and node.get("widgetType") == "button":
+            s = node.setdefault("settings", {})
+            s["border_radius"] = {"unit": "px", "top": r, "right": r, "bottom": r, "left": r, "isLinked": True}
+            s["text_padding"]  = {"unit": "px", "top": py, "right": px, "bottom": py, "left": px, "isLinked": False}
+            diff["buttons_styled"].append({"widget_id": node.get("id")})
+        for child in node.get("elements", []) or []:
+            visit(child)
+
+    visit(out)
+    return out, diff
