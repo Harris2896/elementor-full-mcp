@@ -17,8 +17,12 @@ class Auth {
         if (!is_null($result)) return $result;
 
         $uri = $_SERVER['REQUEST_URI'] ?? '';
-        if (strpos($uri, '/wp-json/' . self::NS . '/') === false
-            && strpos($uri, 'rest_route=/' . self::NS . '/') === false) {
+        $matches_our_ns = strpos($uri, '/wp-json/' . self::NS . '/') !== false
+            || strpos($uri, 'rest_route=/' . self::NS . '/') !== false;
+        // Also authenticate WP media upload route so image_upload via /wp/v2/media works
+        $matches_media   = strpos($uri, '/wp-json/wp/v2/media') !== false
+            || strpos($uri, 'rest_route=/wp/v2/media') !== false;
+        if (!$matches_our_ns && !$matches_media) {
             return null;
         }
 

@@ -70,4 +70,30 @@ class AuthTest extends TestCase {
         // Pre-authed (e.g., a cookie session) → upstream value passes through
         $this->assertTrue($auth->filter(true));
     }
+
+    public function test_authenticates_wp_media_endpoint_when_bearer_valid() {
+        $store = [];
+        Functions\when('get_option')->alias(function ($_k, $default = []) use (&$store) { return $store; });
+        Functions\when('update_option')->alias(function ($_k, $v) use (&$store) {
+            $store = $v; return true;
+        });
+
+        $keys = new Api_Keys();
+        $made = $keys->generate(1, 'media-test', ['write']);
+
+        $_SERVER['REQUEST_URI']        = '/wp-json/wp/v2/media';
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $made['raw'];
+
+        Functions\expect('wp_set_current_user')->once()->with(1);
+        $auth = new Auth($keys);
+        $this->assertNull($auth->filter(null));
+    }
+
+    public function test_passthrough_for_wp_posts_endpoint_even_with_bearer() {
+        $_SERVER['REQUEST_URI']        = '/wp-json/wp/v2/posts';
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer emcp_aaa_bbb';
+        $auth = new Auth(new Api_Keys());
+        // Not our namespace, not media — must passthrough (return $result which is null)
+        $this->assertNull($auth->filter(null));
+    }
 }
