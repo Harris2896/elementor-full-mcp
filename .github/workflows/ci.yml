@@ -46,7 +46,15 @@ jobs:
         working-directory: wp-plugin
         run: composer install --no-interaction --no-progress
       - run: npm i -g @wordpress/env
+      - name: Pre-create uploads dir with permissive perms (CI Docker mount)
+        run: |
+          mkdir -p .wp-env/uploads
+          chmod -R 777 .wp-env/uploads
       - run: wp-env start
+      - name: Make uploads writable inside container (www-data uid)
+        run: |
+          wp-env run cli sh -c "chmod -R 777 /var/www/html/wp-content/uploads || true"
+        continue-on-error: true
       - name: Activate bridge plugin
         run: wp-env run cli wp plugin activate wp-plugin
       - name: Install + activate Elementor (mu-plugin shim handles is_plugin_active)
