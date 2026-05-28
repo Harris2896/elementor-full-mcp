@@ -117,6 +117,46 @@ def build_server() -> Server:
                     "required": ["page_id"], "additionalProperties": False,
                 },
             ),
+            Tool(name="section_list", description="List flat section summaries for a page.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},
+                 },"required":["page_id"],"additionalProperties":False}),
+            Tool(name="section_get", description="Get a single section's full JSON.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},"sid":{"type":"string"},
+                 },"required":["page_id","sid"],"additionalProperties":False}),
+            Tool(name="section_add", description="Append or insert a new section.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},
+                     "section_json":{"type":"object"},
+                     "position":{"type":"integer"},
+                 },"required":["page_id","section_json"],"additionalProperties":False}),
+            Tool(name="section_update", description="Replace a section by id.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},"sid":{"type":"string"},
+                     "section_json":{"type":"object"},
+                 },"required":["page_id","sid","section_json"],"additionalProperties":False}),
+            Tool(name="section_delete", description="Delete a section by id.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},"sid":{"type":"string"},
+                 },"required":["page_id","sid"],"additionalProperties":False}),
+            Tool(name="section_duplicate", description="Duplicate a section in place (right after).",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},"sid":{"type":"string"},
+                 },"required":["page_id","sid"],"additionalProperties":False}),
+            Tool(name="section_reorder", description="Reorder sections.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},
+                     "order":{"type":"array","items":{"type":"string"}},
+                 },"required":["page_id","order"],"additionalProperties":False}),
+            Tool(name="section_history", description="List the last 5 backups for a page.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},
+                 },"required":["page_id"],"additionalProperties":False}),
+            Tool(name="section_restore", description="Restore a backup version.",
+                 inputSchema={"type":"object","properties":{
+                     "page_id":{"type":"integer"},"version":{"type":"integer"},
+                 },"required":["page_id","version"],"additionalProperties":False}),
         ]
 
     @server.call_tool()
@@ -129,6 +169,17 @@ def build_server() -> Server:
             profile_get,
             profile_list,
             profile_update,
+        )
+        from .tools.section import (
+            section_add,
+            section_delete,
+            section_duplicate,
+            section_get,
+            section_history,
+            section_list,
+            section_reorder,
+            section_restore,
+            section_update,
         )
         if name == "auth_verify":
             result = auth_verify(client)
@@ -152,6 +203,24 @@ def build_server() -> Server:
             result = page_get(client, **arguments)
         elif name == "page_delete":
             result = page_delete(client, **arguments)
+        elif name == "section_list":
+            result = section_list(client, **arguments)
+        elif name == "section_get":
+            result = section_get(client, **arguments)
+        elif name == "section_add":
+            result = section_add(client, **arguments)
+        elif name == "section_update":
+            result = section_update(client, **arguments)
+        elif name == "section_delete":
+            result = section_delete(client, **arguments)
+        elif name == "section_duplicate":
+            result = section_duplicate(client, **arguments)
+        elif name == "section_reorder":
+            result = section_reorder(client, **arguments)
+        elif name == "section_history":
+            result = section_history(client, **arguments)
+        elif name == "section_restore":
+            result = section_restore(client, **arguments)
         else:
             return [TextContent(type="text", text=json.dumps({
                 "ok": False,
