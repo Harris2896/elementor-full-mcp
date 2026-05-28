@@ -49,37 +49,32 @@ jobs:
       - run: wp-env start
       - name: Activate bridge plugin
         run: wp-env run cli wp plugin activate wp-plugin
-      - name: Install Elementor (download only, no activation)
-        run: wp-env run cli wp plugin install elementor --version=3.21.0
-        continue-on-error: true
-      - name: Activate Elementor via direct option write (sidesteps init crash)
+      - name: Install + activate Elementor (mu-plugin shim handles is_plugin_active)
         run: |
-          wp-env run cli wp --skip-plugins=elementor option update active_plugins \
-            '["wp-plugin/elementor-mcp-bridge.php","elementor/elementor.php"]' --format=json
+          wp-env run cli wp plugin install elementor --version=3.21.0 --activate
         continue-on-error: true
       - name: Ensure Elementor active kit exists
         run: |
-          KIT=$(wp-env run cli wp --skip-plugins=elementor option get elementor_active_kit 2>/dev/null | tr -d '\r\n ')
+          KIT=$(wp-env run cli wp option get elementor_active_kit 2>/dev/null | tr -d '\r\n ')
           if [ -z "$KIT" ] || [ "$KIT" = "0" ]; then
-            NEW_KIT=$(wp-env run cli wp --skip-plugins=elementor post create --post_type=elementor_library --post_title='CI Kit' --post_status=publish --porcelain 2>/dev/null | tr -d '\r\n ')
+            NEW_KIT=$(wp-env run cli wp post create --post_type=elementor_library --post_title='CI Kit' --post_status=publish --porcelain 2>/dev/null | tr -d '\r\n ')
             if [ -z "$NEW_KIT" ]; then
-              # Fallback: post type elementor_library may not be registered if Elementor failed to install.
-              # Use a regular post as the kit holder — Rest_Kit just reads/writes postmeta by ID.
-              NEW_KIT=$(wp-env run cli wp --skip-plugins=elementor post create --post_type=page --post_title='CI Kit' --post_status=publish --porcelain | tr -d '\r\n ')
+              # Fallback when elementor_library post type is not registered
+              NEW_KIT=$(wp-env run cli wp post create --post_type=page --post_title='CI Kit' --post_status=publish --porcelain | tr -d '\r\n ')
             fi
-            wp-env run cli wp --skip-plugins=elementor option update elementor_active_kit $NEW_KIT
+            wp-env run cli wp option update elementor_active_kit $NEW_KIT
             echo "Created kit $NEW_KIT"
           else
             echo "Active kit already exists: $KIT"
           fi
       - name: Ensure pretty permalinks
         run: |
-          wp-env run cli wp --skip-plugins=elementor rewrite structure '/%postname%/'
-          wp-env run cli wp --skip-plugins=elementor rewrite flush
+          wp-env run cli wp rewrite structure '/%postname%/'
+          wp-env run cli wp rewrite flush
       - name: Mint API key
         id: keygen
         run: |
-          KEY=$(wp-env run cli wp --skip-plugins=elementor eval '
+          KEY=$(wp-env run cli wp eval '
             require_once ABSPATH . "wp-content/plugins/wp-plugin/elementor-mcp-bridge.php";
             echo (new \ElementorMCP\Api_Keys())->generate(1, "ci", ["read","write"])["raw"];
           ' | tr -d '\r\n ')
